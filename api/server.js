@@ -4,7 +4,7 @@
  * @Author: 웃□宇♂
  * @Date: 2019-08-28 10:14:09
  * @LastEditors: 웃□宇♂
- * @LastEditTime: 2019-09-04 20:03:55
+ * @LastEditTime: 2019-09-04 20:48:07
  */
 
 const Router = require('koa-router')
@@ -32,28 +32,67 @@ const Router = require('koa-router')
  */
 
 const api = new Router()
-const Utils = require('../common/util');
+const Utils = require('../common/util')
+const Server = require('../model/server')
+
 api.prefix('/server')
 
-// 新增站点
-api.post('/www', async ctx => {
-    // ctx.verifyParams({
-    //     port: 'number',
-    //     db: 'string',
-    //     domain_name: 'string',
-    //     rr: 'string',
-    //     value: 'string'
-    // });
+// 新增服务器
+api.post('/', async ctx => {
+    ctx.verifyParams({
+        name: 'string',
+        ip: 'string',
+        passwd: 'string'
+    })
 
-    // 验证端口是否占用
-    // console.log(await verifyPort());
-    // ctx.body = 102
-    // git clone http://192.168.160.250:8010/web/web-center.git
-    // 拉取代码
-    console.log(await remoteCmd('git clone  --no-checkout http://wukuangyu:a19940614@192.168.160.250:8010/web/web-center.git abc'));
-    // 
-    ctx.body = '拉取成功';
-});
+    const server = await Server(ctx.request.body).save()
+    ctx.body = server
+})
+
+// 删除服务器
+api.delete('/', async ctx => {
+    ctx.verifyParams({
+        ids: 'array'
+    })
+    const { ids = [] } = ctx.request.body
+
+    const result = await Server.remove({ _id: { $in: ids } })
+    if (result) {
+        ctx.body = result
+    }
+})
+
+// 修改服务器
+api.put('/:_id', async ctx => {
+    ctx.verifyParams({
+        name: 'string',
+        domain: 'string',
+        passwd: 'string'
+    })
+
+    const { _id } = ctx.params
+    const { name, ip, account, passwd } = ctx.request.body
+
+    const server = await Server.findOneAndUpdate({ _id }, { name, ip, account, passwd })
+    if (server) {
+        ctx.body = server
+    }
+})
+
+// 查询服务器列表
+api.get('/', async ctx => {
+    const { size, index } = ctx.util.getPageInfo(ctx.query)
+    const servers = await Server.find().sort({ createdAt: -1 }).limit(size).skip(index)
+    const total = await Server.countDocuments()
+    const list = servers.map(server => server.toObject({ virtuals: true }))
+
+    ctx.body = {
+        list,
+        total,
+    }
+
+})
+
 
 api.post('/verify_port', async ctx => {
     ctx.verifyParams({
@@ -61,7 +100,7 @@ api.post('/verify_port', async ctx => {
     });
 
     let data = await verifyPort(ctx.request.body.port);
-    if(!data) ctx.status = 409;
+    if (!data) ctx.status = 409;
     ctx.body = {
         data
     };
@@ -77,9 +116,8 @@ function remoteCmd(cmd, options) {
 }
 
 async function verifyPort(port) {
-    let data = await remoteCmd(`sudo lsof -i:${port}`, {excludes: [1]});
+    let data = await remoteCmd(`sudo lsof -i:${port}`, { excludes: [1] });
     return !data;
 }
-
 
 module.exports = api

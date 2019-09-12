@@ -1,3 +1,11 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @Author: 웃□宇♂
+ * @Date: 2019-08-27 21:30:58
+ * @LastEditors: 웃□宇♂
+ * @LastEditTime: 2019-09-12 11:42:22
+ */
 const path = require('path')
 const Koa = require('koa')
 const koaLogger = require('koa-logger')
@@ -29,5 +37,7 @@ app.use(koaStatic(path.resolve(__dirname, './static')))
 app.use(router.routes())
 app.use(router.allowedMethods())
 
-app.listen(config.port)
+app.listen(config.port, function() {
+    console.log(`api 运行在: http://localhost:${config.port}`);
+})
 
