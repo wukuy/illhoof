@@ -4,7 +4,7 @@
  * @Author: 웃□宇♂
  * @Date: 2019-08-28 10:14:09
  * @LastEditors: 웃□宇♂
- * @LastEditTime: 2019-09-04 20:48:07
+ * @LastEditTime: 2019-09-16 14:44:31
  */
 
 const Router = require('koa-router')
@@ -92,32 +92,5 @@ api.get('/', async ctx => {
     }
 
 })
-
-
-api.post('/verify_port', async ctx => {
-    ctx.verifyParams({
-        port: 'string'
-    });
-
-    let data = await verifyPort(ctx.request.body.port);
-    if (!data) ctx.status = 409;
-    ctx.body = {
-        data
-    };
-});
-
-// 推荐端口
-function recommendPort() {
-
-}
-
-function remoteCmd(cmd, options) {
-    return Utils.exec(`sshpass -p '$me@7973**&&$' ssh root@192.168.160.250 '${cmd}'`, options);
-}
-
-async function verifyPort(port) {
-    let data = await remoteCmd(`sudo lsof -i:${port}`, { excludes: [1] });
-    return !data;
-}
 
 module.exports = api

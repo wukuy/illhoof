@@ -4,7 +4,7 @@
  * @Author: 웃□宇♂
  * @Date: 2019-09-04 20:30:29
  * @LastEditors: 웃□宇♂
- * @LastEditTime: 2019-09-04 20:41:35
+ * @LastEditTime: 2019-09-18 20:58:28
  */
 const mongoose = require('mongoose')
 const db = require('../common/database')
@@ -24,15 +24,25 @@ const schema = new Schema({
 	// 部署服务器
 	server: { 
 		type: Schema.Types.ObjectId, 
-		required: true 
+		required: true,
+		ref: 'Server'
 	},
 	// 部署目录
 	path: {
 		type: String,
 		required: true,
-		default: '/opt/app'
+		default: '/var/illhoof'
 	},
-	
+	// 阿里云解析记录
+	recordId: {
+		type: String,
+		required: true,
+	},
+	// 服务端口号
+	port: {
+		type: Number,
+		required: true
+	}
 }, { 
 	versionKey: false,
 	timestamps: true 

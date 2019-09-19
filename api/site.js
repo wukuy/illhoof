@@ -4,13 +4,11 @@
  * @Author: 웃□宇♂
  * @Date: 2019-09-04 20:45:25
  * @LastEditors: 웃□宇♂
- * @LastEditTime: 2019-09-05 19:32:52
+ * @LastEditTime: 2019-09-18 21:00:02
  */
 const Router = require('koa-router')
 const api = new Router()
 const Site = require('../model/site')
-const Server = require('../model/server')
-const Utils = require('../common/util')
 
 api.prefix('/site')
 
@@ -20,24 +18,13 @@ api.post('/', async ctx => {
     name: 'string',
     domain: 'string',
     server: 'string',
-    passwd: 'string'
+    passwd: 'string',
+    recordId: 'string',
+    port: 'string'
   })
-
-  // 验证端口是否占用
-  // console.log(await verifyPort());
-  // ctx.body = 102
-  // git clone http://192.168.160.250:8010/web/web-center.git
-  // 拉取代码
-  // let body = ctx.request.body;
-  // let server = await Server.findById(body.server);
-  // const site = await Site(body).save();
-  
-  // await remoteCmd(`git clone https://github.com/cyrianax/zero.git ${body.domain}`, server);
 
   ctx.body = await Site(ctx.request.body).save();
 })
-
-
 
 
 // 删除站点
@@ -83,31 +70,5 @@ api.get('/', async ctx => {
   }
 
 })
-
-api.post('/verify_port', async ctx => {
-  ctx.verifyParams({
-      port: 'string'
-  });
-
-  let data = await verifyPort(ctx.request.body.port);
-  if (!data) ctx.status = 409;
-  ctx.body = {
-      data
-  };
-});
-
-// 推荐端口
-function recommendPort() {
-
-}
-
-function remoteCmd(cmd, server = {}, options) {
-  return Utils.exec(`sshpass -p '${server.passwd}' ssh ${server.account}@${server.ip} '${cmd}'`, options);
-}
-
-async function verifyPort(port) {
-  let data = await remoteCmd(`sudo lsof -i:${port}`, { excludes: [1] });
-  return !data;
-}
 
 module.exports = api

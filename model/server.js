@@ -1,3 +1,11 @@
+/*
+ * @Descripttion: wukuy
+ * @version: 
+ * @Author: 웃□宇♂
+ * @Date: 2019-09-04 20:15:14
+ * @LastEditors: 웃□宇♂
+ * @LastEditTime: 2019-09-18 20:30:23
+ */
 const mongoose = require('mongoose')
 const db = require('../common/database')
 
@@ -23,6 +31,11 @@ const schema = new Schema({
 		type: String, 
 		required: true 
 	},
+	// nginx配置文件路径
+	nginxConfigPath: {
+		type: String, 
+		default: '/etc/nginx/nginx.conf'
+	}
 }, { 
 	versionKey: false,
 	timestamps: true 
